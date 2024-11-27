@@ -1517,3 +1517,49 @@ class EteeController:
             return self.get_right("system_button")
         else:
             raise ValueError("Input must be: 'left' or 'right'")
+
+    # ---------------- Haptic Control ----------------
+    def set_haptic_enabled(self, dev, enabled):
+        """
+        Set native haptic effect on/off
+
+        :param str dev: Selected device hand. Possible values: "left", "right" or "both"
+        :param bool enabled:
+        :raises ValueError: if the dev input is not "left" or "right" or "both"
+
+        """
+        if dev == "left":
+            prefix = "BL"
+        elif dev == "right":
+            prefix = "BR"
+        elif dev == "both":
+            prefix = "BP"
+        else:
+            raise ValueError("Incorrect dev value, must be 'left' or 'right' or 'both'")
+
+        if enabled:
+            self.driver.send_command(f"{prefix}+h1\r\n".encode())
+        else:
+            self.driver.send_command(f"{prefix}+h0\r\n".encode())
+
+    def play_haptic(self, dev, on_duration=3000, off_duration=3000, repeat_count=5):
+        """
+        Play PWM-based haptic effects
+
+        :param str dev: Selected device hand. Possible values: "left", "right" or "both"
+        :param int on_duration: 0 - 65535
+        :param int off_duration: 0 - 65535
+        :param int repeat_count: 0 - 65535
+        :raises ValueError: if the dev input is not "left" or "right" or "both"
+        """
+        if dev == "left":
+            prefix = "BL"
+        elif dev == "right":
+            prefix = "BR"
+        elif dev == "both":
+            prefix = "BP"
+        else:
+            raise ValueError("Incorrect dev value, must be 'left' or 'right' or 'both'")
+
+        self.driver.send_command(f"{prefix}+PH={on_duration},{off_duration},{repeat_count},\r\n".encode())
+
