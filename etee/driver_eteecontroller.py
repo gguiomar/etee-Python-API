@@ -160,22 +160,22 @@ class EteeController:
     # ---------------- Utility ----------------
     def connect_port(self, port=None):
         """
-        Attempt to establish serial connection to an etee dongle port. If a COM port argument is provided,
-        connection is attempted with the specified port. If the port argument is None, the driver automatically detects
-        any COM ports with an etee dongle and connects to the first available one. Default port value is None.
+        Attempt to establish serial connection to an etee dongle port. Supports both Windows (COMx)
+        and Unix-style (/dev/...) port names.
 
-        :param str or None port: etee dongle COM port.
+        :param str or None port: etee dongle port name.
         :return: Success flag - True if the connection is successful, False if otherwise
         :rtype: bool
         """
-        if port[0:3] == 'COM':
+        # Accept both Windows-style COM ports and Unix-style device ports
+        if port.startswith('COM') or port.startswith('/dev/'):
             return self.driver.connect(port)
         else:
-            raise ValueError("The port value should be of the form 'COMx', where x is the COM port number.")
+            raise ValueError("Invalid port format. Expected 'COMx' for Windows or '/dev/...' for Unix systems")
 
     def connect(self):
         """
-        Establish serial connection to an etee dongle. This function automatically detects etee dongles connected to a COM port
+        Establish serial connection to an etee dongle. This function automatically detects etee dongles
         and connects to the first available one.
         """
         available_ports = self.get_available_etee_ports()
